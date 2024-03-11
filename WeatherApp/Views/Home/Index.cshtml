@@ -1,0 +1,119 @@
+﻿@model WeatherApp.Models.Weather
+
+@{
+	ViewData["Title"] = "Index";
+}
+
+<h1>Weather</h1>
+
+<div>
+	<h4>5 day Forecast</h4>
+	<div class="accordion" id="weatherAccordion">
+		@{
+			bool collapse = true;
+		}
+		@foreach (var day in Model.WeatherList.DistinctBy(x => x.Date))
+		{
+			string show = "accordion-collapse collapse show";
+			if (!collapse)
+			{
+				show = "accordion-collapse collapse";
+			}
+			string id = "collapse" + day.Dt.ToString();
+			collapse = false;
+
+			<div class="accordion-item">
+				<h2 class="accordion-header">
+					<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#@id" aria-expanded="true" aria-controls="@id">
+						@Html.DisplayFor(model => day.Date)
+					</button>
+				</h2>
+				<div id="@id" class="@show" data-bs-parent="#weatherAccordion">
+					<div class="accordion-body">
+						<table class="table">
+							<thead>
+								<tr>
+									<th>
+										Time
+									</th>
+									<th>
+										Weather
+									</th>
+									<th>
+										Description
+									</th>
+									<th>
+										Temp
+									</th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach (var item in Model.WeatherList.Where(x => x.Date == day.Date))
+								{
+									<tr>
+										<td>
+											@Html.DisplayFor(model => item.Time)
+										</td>
+										@foreach (var desc in item.Description)
+										{
+											<td>
+												@{
+													string url = $"https://openweathermap.org/img/wn/{desc.Icon}.png";
+												}
+												<img class="img-fluid" src="@url" />
+												@Html.DisplayFor(model => desc.Main)
+											</td>
+											<td>
+												@Html.DisplayFor(model => desc.Short)
+											</td>
+										}
+										<td>
+											@Html.DisplayFor(model => item.Temps.Rounded)&deg;C
+											<div class="text-danger">
+												(High: @Html.DisplayFor(model => item.Temps.RoundedMax)&deg;C / Low: @Html.DisplayFor(model => item.Temps.RoundedMin)&deg;C)
+											</div>
+										</td>
+									</tr> 
+								}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		}
+	</div>
+</div>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Honk&family=Madimi+One&display=swap" rel="stylesheet">
+<style>
+	body {
+		font-family: "Madimi One", sans-serif;
+		font-weight: 400;
+		font-style: normal;
+	}
+
+	.accordion-button {
+		font-size: 25px;
+	}
+
+	h1 {
+		font-size: 60px;
+		text-align: center;
+		font-family: "Honk", system-ui;
+		font-optical-sizing: auto;
+		font-weight: 400;
+		font-style: normal;
+		font-variation-settings: "MORF" 15, "SHLN" 50;
+	}
+
+	h4 {
+		text-align: center;
+	}
+
+	.text-danger {
+		font-size: 14px;
+		font-style: italic;
+	}
+</style>
