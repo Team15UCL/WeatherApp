@@ -1,4 +1,4 @@
-﻿@model WeatherApp.Models.Weather
+﻿@model IEnumerable<WeatherApp.Models.WeatherData>
 
 @{
 	ViewData["Title"] = "Index";
@@ -12,20 +12,20 @@
 		@{
 			bool collapse = true;
 		}
-		@foreach (var day in Model.WeatherList.DistinctBy(x => x.Date))
+		@foreach (var day in Model.DistinctBy(x => x.Day))
 		{
 			string show = "accordion-collapse collapse show";
 			if (!collapse)
 			{
 				show = "accordion-collapse collapse";
 			}
-			string id = "collapse" + day.Dt.ToString();
+			string id = "collapse" + day.Day;
 			collapse = false;
 
 			<div class="accordion-item">
 				<h2 class="accordion-header">
 					<button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#@id" aria-expanded="true" aria-controls="@id">
-						@Html.DisplayFor(model => day.Date)
+						@Html.DisplayFor(model => day.Day)
 					</button>
 				</h2>
 				<div id="@id" class="@show" data-bs-parent="#weatherAccordion">
@@ -48,32 +48,30 @@
 								</tr>
 							</thead>
 							<tbody>
-								@foreach (var item in Model.WeatherList.Where(x => x.Date == day.Date))
+								@foreach (var item in Model.Where(x => x.Day == day.Day))
 								{
 									<tr>
 										<td>
 											@Html.DisplayFor(model => item.Time)
 										</td>
-										@foreach (var desc in item.Description)
-										{
-											<td>
-												@{
-													string url = $"https://openweathermap.org/img/wn/{desc.Icon}.png";
-												}
-												<img class="img-fluid" src="@url" />
-												@Html.DisplayFor(model => desc.Main)
-											</td>
-											<td>
-												@Html.DisplayFor(model => desc.Short)
-											</td>
-										}
 										<td>
-											@Html.DisplayFor(model => item.Temps.Rounded)&deg;C
+											@{
+												string url = $"https://openweathermap.org/img/wn/{item.Icon}.png";
+											}
+											<img class="img-fluid" src="@url" />
+											@Html.DisplayFor(model => item.WeatherCondition)
+										</td>
+										<td>
+											@Html.DisplayFor(model => item.Description)
+										</td>
+
+										<td>
+											@Html.DisplayFor(model => item.Temperature)&deg;C
 											<div class="text-danger">
-												(High: @Html.DisplayFor(model => item.Temps.RoundedMax)&deg;C / Low: @Html.DisplayFor(model => item.Temps.RoundedMin)&deg;C)
+												(High: @Html.DisplayFor(model => item.MaxTemp)&deg;C / Low: @Html.DisplayFor(model => item.MinTemp)&deg;C)
 											</div>
 										</td>
-									</tr> 
+									</tr>
 								}
 							</tbody>
 						</table>
