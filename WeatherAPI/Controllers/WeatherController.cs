@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using WeatherAPI.Converters;
 using WeatherAPI.Models;
@@ -9,13 +8,6 @@ namespace WeatherAPI.Controllers;
 [ApiController]
 public class WeatherController : ControllerBase
 {
-	private readonly WeatherContext _context;
-
-	public WeatherController(WeatherContext context)
-	{
-		_context = context;
-	}
-
 	HttpClient client = new()
 	{
 		BaseAddress = new Uri("https://api.openweathermap.org/")
@@ -65,9 +57,6 @@ public class WeatherController : ControllerBase
 			weatherDataSet.Add(weatherData);
 		}
 
-		await _context.WeatherDataSet.AddRangeAsync(weatherDataSet);
-		await _context.SaveChangesAsync();
-
 		return weatherDataSet;
 	}
 
@@ -110,12 +99,6 @@ public class WeatherController : ControllerBase
 		}
 
 		return weatherDataSet;
-	}
-
-	[HttpGet("fromDb")]
-	public async Task<ActionResult<IEnumerable<WeatherData>>> GetFromDb()
-	{
-		return await _context.WeatherDataSet.ToListAsync();
 	}
 }
 
