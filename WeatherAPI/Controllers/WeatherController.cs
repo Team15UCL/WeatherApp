@@ -18,14 +18,14 @@ public class WeatherController : ControllerBase
 
 	HttpClient client = new()
 	{
-		BaseAddress = new Uri("https://api.openweathermap.org/data/2.5/")
+		BaseAddress = new Uri("https://api.openweathermap.org/")
 	};
 
 	[HttpGet("5day")]
 	[ResponseCache(CacheProfileName = "Default")]
-	public async Task<ActionResult<List<WeatherData>>> GetFiveDayWeatherData(string? lat, string? lon)
+	public async Task<ActionResult<List<WeatherData>>> GetFiveDayWeatherData(string? city)
 	{
-		if (lat == null || lon == null)
+		if (city == null)
 		{
 			return new ContentResult()
 			{
@@ -34,9 +34,14 @@ public class WeatherController : ControllerBase
 			};
 		}
 
-		var test = await client.GetAsync($"forecast?lat={lat}&lon={lon}&appid=747bcc2140e625521d195c8cb07c6ef0&units=metric");
+		var cityresponse = await client.GetStringAsync($"geo/1.0/direct?q={city}&appid=747bcc2140e625521d195c8cb07c6ef0&limit=1");
 
-		var response = await client.GetStringAsync($"forecast?lat={lat}&lon={lon}&appid=747bcc2140e625521d195c8cb07c6ef0&units=metric");
+		List<GeoRoot>? geo = JsonConvert.DeserializeObject<List<GeoRoot>>(cityresponse);
+
+		string lat = geo[0].Lat.ToString();
+		string lon = geo[0].Lon.ToString();
+
+		var response = await client.GetStringAsync($"data/2.5/forecast?lat={lat}&lon={lon}&appid=747bcc2140e625521d195c8cb07c6ef0&units=metric");
 
 		var forecast = JsonConvert.DeserializeObject<Root>(response);
 
@@ -78,7 +83,7 @@ public class WeatherController : ControllerBase
 			};
 		}
 
-		var response = await client.GetStringAsync($"forecast?lat={lat}&lon={lon}&appid=747bcc2140e625521d195c8cb07c6ef0&units=metric");
+		var response = await client.GetStringAsync($"data/2.5/forecast?lat={lat}&lon={lon}&appid=747bcc2140e625521d195c8cb07c6ef0&units=metric");
 
 		var forecast = JsonConvert.DeserializeObject<Root>(response);
 

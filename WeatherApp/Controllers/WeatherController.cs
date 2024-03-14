@@ -19,12 +19,11 @@ public class WeatherController : Controller
 	}
 
 	[HttpGet]
-	public async Task<IActionResult> Index(string lat = "56.1364", string lon = "9.1546")
+	public async Task<IActionResult> Index(string? city = "ikast")
 	{
-		ViewData["latitude"] = lat;
-		ViewData["longitude"] = lon;
+		ViewData["city"] = city;
 
-		IEnumerable<WeatherData> weather = await GetFiveDayFromOwnAPI(lat, lon);
+		IEnumerable<WeatherData> weather = await GetFiveDayFromOwnAPI(city);
 		return View(weather);
 	}
 
@@ -40,9 +39,9 @@ public class WeatherController : Controller
 		return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
 	}
 
-	private async Task<IEnumerable<WeatherData>> GetFiveDayFromOwnAPI(string lat, string lon)
+	private async Task<IEnumerable<WeatherData>> GetFiveDayFromOwnAPI(string city)
 	{
-		var response = await client.GetStringAsync(client.BaseAddress + $"5day?lat={lat}&lon={lon}");
+		var response = await client.GetStringAsync(client.BaseAddress + $"5day?city={city}");
 
 		var weatherResponse = JsonConvert.DeserializeObject<IEnumerable<WeatherData>>(response);
 
