@@ -8,6 +8,15 @@
 
 <div>
 	<h4>5 day Forecast</h4>
+	<form asp-action="Index" method="get">
+		<div class="form-actions no-color">
+			<p>
+				Insert latitude: <input type="text" name="lat" value="@ViewData["latitude"]" />
+				and longitude: <input type="text" name="lon" value="@ViewData["longitude"]" />
+				<input type="submit" value="Search" class="btn btn-outline-primary" />
+			</p>
+		</div>
+	</form>
 	<div class="accordion" id="weatherAccordion">
 		@{
 			bool collapse = true;
@@ -34,6 +43,9 @@
 							<thead>
 								<tr>
 									<th>
+										Location
+									</th>
+									<th>
 										Time
 									</th>
 									<th>
@@ -51,6 +63,9 @@
 								@foreach (var item in Model.Where(x => x.Day == day.Day))
 								{
 									<tr>
+										<td>
+											@Html.DisplayFor(model => item.City)
+										</td>
 										<td>
 											@Html.DisplayFor(model => item.Time)
 										</td>

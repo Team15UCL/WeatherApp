@@ -34,6 +34,9 @@
 							<thead>
 								<tr>
 									<th>
+										Location
+									</th>
+									<th>
 										Time
 									</th>
 									<th>
@@ -51,6 +54,9 @@
 								@foreach (var item in Model.Where(x => x.Day == day.Day))
 								{
 									<tr>
+										<td>
+											@Html.DisplayFor(model => item.City)
+										</td>
 										<td>
 											@Html.DisplayFor(model => item.Time)
 										</td>
