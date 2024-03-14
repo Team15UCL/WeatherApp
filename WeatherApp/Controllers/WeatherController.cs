@@ -18,9 +18,10 @@ public class WeatherController : Controller
 		_logger = logger;
 	}
 
-	public async Task<IActionResult> Index()
+	[HttpGet]
+	public async Task<IActionResult> Index(string lat = "56", string lon = "9")
 	{
-		IEnumerable<WeatherData> weather = await GetFiveDayFromOwnAPI("56", "9");
+		IEnumerable<WeatherData> weather = await GetFiveDayFromOwnAPI(lat, lon);
 		return View(weather);
 	}
 

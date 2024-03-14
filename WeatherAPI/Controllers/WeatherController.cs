@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using WeatherAPI.Converters;
 using WeatherAPI.Models;
@@ -21,6 +22,7 @@ public class WeatherController : ControllerBase
 	};
 
 	[HttpGet("5day")]
+	[ResponseCache(CacheProfileName = "Default")]
 	public async Task<ActionResult<List<WeatherData>>> GetFiveDayWeatherData(string? lat, string? lon)
 	{
 		if (lat == null || lon == null)
@@ -31,6 +33,8 @@ public class WeatherController : ControllerBase
 				Content = "Du skal da lige huske at skrive længegrad og breddegrad, tumpe!"
 			};
 		}
+
+		var test = await client.GetAsync($"forecast?lat={lat}&lon={lon}&appid=747bcc2140e625521d195c8cb07c6ef0&units=metric");
 
 		var response = await client.GetStringAsync($"forecast?lat={lat}&lon={lon}&appid=747bcc2140e625521d195c8cb07c6ef0&units=metric");
 
@@ -55,6 +59,9 @@ public class WeatherController : ControllerBase
 
 			weatherDataSet.Add(weatherData);
 		}
+
+		await _context.WeatherDataSet.AddRangeAsync(weatherDataSet);
+		await _context.SaveChangesAsync();
 
 		return weatherDataSet;
 	}
@@ -98,6 +105,12 @@ public class WeatherController : ControllerBase
 		}
 
 		return weatherDataSet;
+	}
+
+	[HttpGet("fromDb")]
+	public async Task<ActionResult<IEnumerable<WeatherData>>> GetFromDb()
+	{
+		return await _context.WeatherDataSet.ToListAsync();
 	}
 }
 

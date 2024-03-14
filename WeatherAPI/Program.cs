@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WeatherAPI.Models;
 
@@ -14,7 +15,17 @@ public class Program
 
 		builder.Services.AddDbContext<WeatherContext>(opt => opt.UseInMemoryDatabase("WeatherDB"));
 
-		builder.Services.AddControllers();
+		builder.Services.AddResponseCaching();
+
+		builder.Services.AddControllers(options =>
+		{
+			options.CacheProfiles.Add("Default",
+				new CacheProfile()
+				{
+					Duration = 10,
+					VaryByQueryKeys = ["*"]
+				});
+		});
 		// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 		builder.Services.AddEndpointsApiExplorer();
 		builder.Services.AddSwaggerGen();
@@ -28,6 +39,8 @@ public class Program
 			app.UseSwagger();
 			app.UseSwaggerUI();
 		}
+
+		app.UseResponseCaching();
 
 		app.UseHttpsRedirection();
 
