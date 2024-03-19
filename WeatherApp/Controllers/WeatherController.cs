@@ -19,12 +19,19 @@ public class WeatherController : Controller
     }
 
     [HttpGet]
-    public async Task<IActionResult> Index(string? city = "ikast")
+    public async Task<IActionResult> Index(string? city = "ikast", int days = 6)
     {
+        ViewData["days"] = days;
         ViewData["city"] = city;
-
         IEnumerable<WeatherData> weather = await GetFiveDayFromOwnAPI(city);
-        return View(weather);
+        List<WeatherData> weatherDays = [];
+
+        for (int i = 0; i < days; i++)
+        {
+            weatherDays.AddRange(weather.Where(x => x.Day == DateTime.Now.AddDays(i).DayOfWeek.ToString()));
+        }
+
+        return View(weatherDays);
     }
 
     public async Task<IActionResult> Current()
